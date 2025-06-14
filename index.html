@@ -1,3 +1,6 @@
+
+  
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,48 +8,102 @@
   <title>Weather App</title>
   <style>
     body {
-      font-family: Arial;
-      background: #f4f7fa;
-      text-align: center;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
     }
-    input, button {
+
+    .container {
+      background: #ffffffdd;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input {
       padding: 10px;
       font-size: 16px;
-      margin: 5px;
+      width: 70%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
     #result {
       margin-top: 20px;
       font-size: 18px;
       color: #333;
+      line-height: 1.6;
+    }
+
+    img {
+      width: 60px;
     }
   </style>
 </head>
 <body>
-  <h1>🌦 Weather App</h1>
-  <input type="text" id="city" placeholder="Enter city name">
-  <button onclick="getWeather()">Get Weather</button>
-  <div id="result"></div>
+  <div class="container">
+    <h1>🌦 Weather App</h1>
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="result"></div>
+  </div>
 
   <script>
     async function getWeather() {
-      const city = document.getElementById("city").value;
-      const apiKey = "15e9b96cd3a9656030bdb8e60a71aec0"; 
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+      const city = document.getElementById("city").value.trim();
+      const apiKey = "15e9b96cd3a9656030bdb8e60a71aec0";  // Replace with your API key
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${apiKey}`;
 
       try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error("City not found");
         const data = await response.json();
 
-        const temp = data.main.temp;
-        const desc = data.weather[0].description;
-        const wind = data.wind.speed;
+        if (response.ok) {
+          const temp = data.main.temp;
+          const desc = data.weather[0].description;
+          const wind = data.wind.speed;
+          const icon = data.weather[0].icon;
 
-        document.getElementById("result").innerHTML =
-          `<strong>${city}</strong><br>Temperature: ${temp}°C<br>Description: ${desc}<br>Wind Speed: ${wind} m/s`;
+          document.getElementById("result").innerHTML =
+            `<strong>${data.name}</strong><br>
+             <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="weather icon"><br>
+             🌡 Temperature: ${temp}°C<br>
+             ☁️ Condition: ${desc}<br>
+             🌬 Wind Speed: ${wind} m/s`;
+        } else {
+          document.getElementById("result").textContent = "❌ " + data.message;
+        }
       } catch (error) {
-        document.getElementById("result").textContent = "City not found. Try again.";
+        document.getElementById("result").textContent = "⚠️ Error fetching data.";
       }
     }
   </script>
